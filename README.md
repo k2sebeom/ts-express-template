@@ -1,6 +1,4 @@
-# Backend for LayUs
-
-Hello World
+# Typescript Express server template
 
 ## Setup
 ```
