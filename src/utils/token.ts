@@ -17,6 +17,18 @@ export function validateToken(jwtToken: string, id: number): boolean {
     return true;
 }
 
+export function verifyToken(jwtToken: string): number | null {
+    const token = jwtToken.replace('Bearer ', '');
+    try {
+        const info = jwt.verify(token, config.jwtSecret) as TokenInterface;
+        return info.id;
+    }
+    catch {
+        return null;
+    }
+    return null;
+}
+
 export function getCredentials(id: number): Credentials {
     const refreshToken = jwt.sign({ id }, config.jwtSecret, {
         expiresIn: '14d',

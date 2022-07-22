@@ -18,7 +18,8 @@
     "express": "^4.17.3",
     "jsonwebtoken": "^8.5.1",
     "prisma": "^4.1.0",
-    "reflect-metadata": "^0.1.13"
+    "reflect-metadata": "^0.1.13",
+    "typedi": "^0.10.0"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",

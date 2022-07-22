@@ -1,11 +1,8 @@
-import { Router, Request, Response } from 'express';
+import { Router, Response } from 'express';
 import { RefreshRequest, SignInRequest, SignUpRequest } from '../../@types/models/AuthRequest';
-import * as bcrypt from 'bcrypt';
-import * as jwt from 'jsonwebtoken';
-import db from '../../utils/db';
-import config from '../../config';
-import { Credentials, TokenInterface } from '../../@types/Auth';
-import { getCredentials, validateToken } from '../../utils/token';
+import Container from 'typedi';
+import AuthService from '../../services/auth';
+import isAuth from '../middlewares/isAuth';
 
 
 const route = Router();
@@ -13,37 +10,30 @@ const route = Router();
 export default (app: Router) => {
     app.use('/auth', route);
 
-    route.post('/signin', async (req: SignInRequest, res: Response) => {
+    route.post('/signin', isAuth, async (req: SignInRequest, res: Response) => {
         const { email, password } = req.body;
         if(!email || !password) {
             res.status(400).send({ msg: 'Invalid Fields' });
             return;
         }
 
-        const user = await db.auth.findUnique({
-            where: { email }
-        });
+        const authService = Container.get(AuthService);
+
+        const user = await authService.getUser(email);
 
         if(!user) {
             res.status(404).send({ msg: 'User not found' });
             return;
         }
 
-        const isPwValid = await bcrypt.compare(password, user.pw);
+        const isPwValid = await authService.isPasswordValid(password, user.pw);
 
         if(!isPwValid) {
             res.status(401).send({ msg: 'Password Incorrect' });
             return;
         }
 
-        const cred = getCredentials(user.id);
-
-        await db.auth.update({
-            where: { id: user.id },
-            data: {
-                refreshToken: cred.refreshToken
-            }
-        });
+        const cred = await authService.updateUserRefreshToken(user.id);
 
         res.send({
             result: {
@@ -61,32 +51,17 @@ export default (app: Router) => {
             return;
         }
 
-        const user = await db.auth.findFirst({
-            where: { email }
-        });
+        const authService = Container.get(AuthService);
+
+        const user = await authService.getUser(email);
 
         if(user) {
             res.status(400).send({ msg: 'Email already exists' });
             return;
         }
 
-        const pwHash = await bcrypt.hash(password, 12);
-
-        const newUser = await db.auth.create({
-            data: {
-                email,
-                pw: pwHash
-            }
-        });
-
-        const cred = getCredentials(newUser.id);
-
-        await db.auth.update({
-            where: { id: newUser.id },
-            data: {
-                refreshToken: cred.refreshToken
-            }
-        });
+        const newUser = await authService.createUser(email, password);
+        const cred = await authService.updateUserRefreshToken(newUser.id);
 
         res.send({
             result: {
@@ -104,37 +79,30 @@ export default (app: Router) => {
             return;
         }
 
-        const user = await db.auth.findUnique({
-            where: { email }
-        });
+        const authService = Container.get(AuthService);
+
+        const user = await authService.getUser(email);
 
         if(!user) {
             res.status(404).send({ msg: 'User not found' });
             return;
         }
 
-        const isPwValid = await bcrypt.compare(password, user.pw);
+        const isPwValid = await authService.isPasswordValid(password, user.pw);
 
         if(!isPwValid) {
             res.status(401).send({ msg: 'Password Incorrect' });
             return;
         }
 
-        const isTokenValid = await validateToken(refreshToken, user.id);
+        const isTokenValid = await authService.isRefreshTokenValid(refreshToken, user.id);
 
         if(isTokenValid) {
             res.status(401).send({ msg: 'Token Invalid' });
             return;
         }
 
-        const cred = getCredentials(user.id);
-
-        await db.auth.update({
-            where: { id: user.id },
-            data: {
-                refreshToken: cred.refreshToken
-            }
-        });
+        const cred = await authService.updateUserRefreshToken(user.id);
 
         res.send({
             result: {
