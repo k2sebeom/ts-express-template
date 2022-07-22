@@ -5,17 +5,17 @@ import config from '../config';
 import * as cors from 'cors';
 
 export default async (app) => {
-    app.get('/health', (req: express.Request, res: express.Response) => {
-        res.status(200).send({
-            status: true
-        });
+  app.get('/health', (req: express.Request, res: express.Response) => {
+    res.status(200).send({
+      status: true,
     });
+  });
 
-    // Use CORS
-    app.use(cors());
+  // Use CORS
+  app.use(cors());
 
-    app.use(express.json());
+  app.use(express.json());
 
-    // Load API routes
-    app.use(config.api.prefix, router());
-}
+  // Load API routes
+  app.use(config.api.prefix, router());
+};

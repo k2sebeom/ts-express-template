@@ -1,16 +1,12 @@
-import { JwtPayload } from 'jsonwebtoken'
-
+import { JwtPayload } from 'jsonwebtoken';
 
 interface Credentials {
-    accessToken: string,
-    refreshToken: string
+  accessToken: string;
+  refreshToken: string;
 }
 
 interface TokenInterface extends JwtPayload {
-    id: number
+  id: number;
 }
 
-export type {
-    Credentials,
-    TokenInterface
-}
+export type { Credentials, TokenInterface };

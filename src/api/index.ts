@@ -2,12 +2,10 @@ import { Router } from 'express';
 
 import auth from './routes/auth';
 
-
 // guaranteed to get dependencies
 export default () => {
-	const router = Router();
+  const router = Router();
+  auth(router);
 
-    auth(router);
-	
-	return router;
-}
+  return router;
+};
