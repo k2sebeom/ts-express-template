@@ -14,7 +14,16 @@ interface SignInRequest extends Request {
     }
 }
 
+interface RefreshRequest extends Request {
+    body: {
+        email: string,
+        password: string,
+        refreshToken: string
+    }
+}
+
 export type {
     SignUpRequest,
-    SignInRequest
+    SignInRequest,
+    RefreshRequest
 }
