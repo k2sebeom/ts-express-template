@@ -1,10 +1,9 @@
 import 'dotenv/config';
 
-
 export default {
-    port: process.env.PORT,
+  port: process.env.PORT,
 
-    api: {
-        prefix: '/api'
-    }
-}
+  api: {
+    prefix: '/api',
+  },
+};
