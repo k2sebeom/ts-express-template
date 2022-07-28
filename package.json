@@ -31,5 +31,8 @@
     "prettier": "^2.7.1",
     "ts-node": "^10.7.0",
     "typescript": "^4.6.2"
+  },
+  "bin": {
+    "create-express-ts": "./bin/index.js"
   }
 }
